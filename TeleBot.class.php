@@ -1,44 +1,43 @@
 <?php
 
-// TODO: save chat_id to $confJSON
-// TODO: load chat_id from $confJSON
-
 class TeleBot {
     
-    private $apiRoot = 'https://api.telegram.org/bot';
-    private $confJSON = 'TeleBot.conf.json';
-    private $confData = array();
-    private $botUpdates = array();
+    private $botAPI = 'https://api.telegram.org/bot';
+    private $configJSON = 'TeleBot.conf.json';
+    private $configData = array();
+    private $updatesData = array();
     
     public function __construct() {
-        $this->loadConf();
-        $this->getUpdates();
+        $this->loadConfig();
     }
     
     public function __toString() {
-        $info = print_r($this->confData, true);
+        $this->getUpdates();
+        $info = print_r($this->updatesData, true);
         
         return $info;
     }
     
-    final protected function loadConf() {
-        $json = file_get_contents($this->confJSON);
-        $this->confData = json_decode($json, JSON_OBJECT_AS_ARRAY);
+    final protected function loadConfig() {
+        $json = file_get_contents($this->configJSON);
+        $this->configData = json_decode($json, JSON_OBJECT_AS_ARRAY);
     }
     
-    final protected function saveConf() {
-        $json = json_encode($this->confData, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-        file_put_contents($this->$confJSON, $json, LOCK_EX);
+    final protected function saveConfig() {
+        $json = json_encode($this->configData, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        file_put_contents($this->configJSON, $json, LOCK_EX);
     }
     
     final protected function getUpdates() {
-        $query = $this->apiRoot . $this->confData['token'] . "/getUpdates?offset=0";
+        $query = $this->botAPI . $this->configData['token'] . "/getUpdates?offset=0";
         $result = file_get_contents($query);
-        $this->botUpdates = json_decode($result, JSON_OBJECT_AS_ARRAY);
+        $this->updatesData = json_decode($result, JSON_OBJECT_AS_ARRAY);
     }
     
-    final protected function getChatID($username) {
-        foreach($this->botUpdates['result'] as $update) {
+    final protected function getChatID($username) {        
+        $this->getUpdates();
+        
+        foreach($this->updatesData['result'] as $update) {
             if ($update['message']['chat']['username'] == $username) {
                 $chatID = $update['message']['chat']['id'];
             } else {
@@ -50,7 +49,7 @@ class TeleBot {
     }
     
     final protected function sendMessage($chatID, $text) {
-        $query = $this->apiRoot . $this->confData['token'] . "/sendMessage?chat_id=" . $chatID . "&text=" . $text;
+        $query = $this->botAPI . $this->configData['token'] . "/sendMessage?chat_id=" . $chatID . "&text=" . $text;
         
         if ($result = @file_get_contents($query)) {
             $result = json_decode($result, JSON_OBJECT_AS_ARRAY);
@@ -63,7 +62,14 @@ class TeleBot {
     }
     
     final public function send($username, $text) {
-        $chatID = $this->getChatID($username);
+        // check $username = $chatID (9 digits)
+        if (preg_match('/^[0-9]{9}$/', $this->configData['users'][$username])) {
+            $chatID = $this->configData['users'][$username];
+        } else {
+            $chatID = $this->getChatID($username);
+            $this->configData['users'][$username] = $chatID;
+            $this->saveConfig();
+        }
         $result = $this->sendMessage($chatID, $text);
         
         return $result;
