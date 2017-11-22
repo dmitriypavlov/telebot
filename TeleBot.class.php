@@ -3,7 +3,7 @@
 class TeleBot {
     
     private $botAPI = 'https://api.telegram.org/bot';
-    private $configJSON = 'TeleBot.conf.json';
+    private $configJSON = 'TeleBot.config.json';
     private $configData = array();
     private $updatesData = array();
     
@@ -24,7 +24,7 @@ class TeleBot {
     }
     
     final protected function saveConfig() {
-        $json = json_encode($this->configData, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $json = json_encode($this->configData, JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         file_put_contents($this->configJSON, $json, LOCK_EX);
     }
     
@@ -62,7 +62,7 @@ class TeleBot {
     }
     
     final public function send($username, $text) {
-        // check $username = $chatID (9 digits)
+        // check $username is 9 digits $chatID
         if (preg_match('/^[0-9]{9}$/', $this->configData['users'][$username])) {
             $chatID = $this->configData['users'][$username];
         } else {
@@ -70,6 +70,7 @@ class TeleBot {
             $this->configData['users'][$username] = $chatID;
             $this->saveConfig();
         }
+        
         $result = $this->sendMessage($chatID, $text);
         
         return $result;

@@ -1,12 +1,9 @@
+#!/usr/bin/env php
 <?php
 
 require 'TeleBot.class.php';
 
 $bot = new TeleBot();
-
-echo "<pre>";
-
-echo $bot->send('dmitriypavlovcom', 'hello world');
-#echo $bot;
+$bot->send($argv[1], $argv[2]);
 
 ?>
