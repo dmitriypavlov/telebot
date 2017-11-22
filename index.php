@@ -6,7 +6,6 @@ $bot = new TeleBot();
 
 echo "<pre>";
 
-#echo $bot->send('dmitriypavlovcom', 'hello world');
-echo $bot;
+echo $bot->send('dmitriypavlovcom', 'hello world');
 
 ?>
