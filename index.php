@@ -3,6 +3,10 @@
 require 'TeleBot.class.php';
 
 $bot = new TeleBot();
-$bot->send('username', 'hello world');
+
+echo "<pre>";
+
+#echo $bot->send('dmitriypavlovcom', 'hello world');
+echo $bot;
 
 ?>
