@@ -50,6 +50,7 @@ class TeleBot {
     }
     
     final protected function sendMessage($chatID, $text) {
+        $text = urlencode($text);
         $query = $this->botAPI . $this->configData['token'] . "/sendMessage?chat_id=" . $chatID . "&text=" . $text;
         
         if ($result = @file_get_contents($query)) {
