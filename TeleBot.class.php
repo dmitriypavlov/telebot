@@ -8,6 +8,7 @@ class TeleBot {
     private $updatesData = array();
     
     public function __construct() {
+        $this->configJSON = dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->configJSON;
         $this->loadConfig();
     }
     
