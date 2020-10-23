@@ -3,7 +3,7 @@
 class TeleBot {
 	
 	private $botAPI = "https://api.telegram.org/bot";
-	private $configJSON = "/storage/telebot.json";
+	private $configJSON = "telebot.json";
 	private $configData = [];
 	private $updatesData = [];
 	
@@ -87,8 +87,8 @@ class TeleBot {
 	}  
 }
 
-//function telebot($chat, $message) {
-//
-//	$telebot = new TeleBot();
-//	$telebot->send($chat, $message);
-//}
+function telebot($chat, $message) {
+
+	$telebot = new TeleBot();
+	$telebot->send($chat, $message);
+}
